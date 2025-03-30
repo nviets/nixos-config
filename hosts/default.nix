@@ -9,17 +9,29 @@
 #           └─ default.nix
 #
 
-{ inputs, nixpkgs, nixpkgs-stable, nixos-hardware, home-manager, nur, nixvim, doom-emacs, hyprland, hyprspace, plasma-manager, vars, ... }:
+{ inputs, nixpkgs, nixpkgs-stable, sops-nix, nixos-hardware, home-manager, nur, nixvim, doom-emacs, hyprland, hyprspace, plasma-manager, vars, ... }:
 
 let
   system = "x86_64-linux";
 
-  pkgs = import nixpkgs {
+  nixpkgs-patched = (import nixpkgs { inherit system; }).applyPatches {
+    name = "numpy-patch";
+    src = nixpkgs;
+#    patches = [ ./test.patch ];
+  };
+
+  pkgs = import nixpkgs-patched {
     inherit system;
     config.allowUnfree = true;
   };
 
-  stable = import nixpkgs-stable {
+  nixpkgs-stable-patched = (import nixpkgs-stable { inherit system; }).applyPatches {
+    name = "numpy-patch";
+    src = nixpkgs-stable;
+#    patches = [ ./test.patch ];
+  };
+
+  stable = import nixpkgs-stable-patched {
     inherit system;
     config.allowUnfree = true;
   };
@@ -144,6 +156,34 @@ in
       nur.nixosModules.nur
       nixvim.nixosModules.nixvim
       ./h310m
+      ./configuration.nix
+
+      home-manager.nixosModules.home-manager
+      {
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.users.${vars.user}.imports = [
+          nixvim.homeManagerModules.nixvim
+        ];
+      }
+    ];
+  };
+
+  superx10 = lib.nixosSystem {
+    inherit system;
+    specialArgs = {
+      inherit inputs system stable hyprland hyprspace vars;
+      host = {
+        hostName = "superx10";
+        mainMonitor = "DP-2";
+        #secondMonitor = "HDMI-A-4";
+      };
+    };
+    modules = [
+      sops-nix.nixosModules.sops
+      nur.modules.nixos.default
+      nixvim.nixosModules.nixvim
+      ./superx10
       ./configuration.nix
 
       home-manager.nixosModules.home-manager

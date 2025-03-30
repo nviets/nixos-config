@@ -10,6 +10,7 @@
   };
 
   programs = {
+    mosh.enable = true;
     zsh = {
       enable = true;
       autosuggestions.enable = true;

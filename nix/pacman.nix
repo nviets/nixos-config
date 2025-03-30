@@ -27,6 +27,7 @@
         after = [ "writeBoundary" "createXdgUserDirectories" ];
         before = [ ];
         data = "sudo /usr/bin/update-desktop-database";
+        #data = "sudo echo HELLO";
       };
     };
   };
@@ -40,7 +41,8 @@
     settings = {
       auto-optimise-store = true;
     };
-    package = pkgs.nixFlakes;
+    #package = pkgs.nixFlakes;
+    package = pkgs.nixVersions.stable;
     registry.nixpkgs.flake = inputs.nixpkgs;
     extraOptions = ''
       experimental-features = nix-command flakes

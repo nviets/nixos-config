@@ -50,7 +50,7 @@ in
               wm-restack = "bspwm";
             };
             "bar/sec" = {
-              monitor = "${secondMonitor}";
+#              monitor = "${secondMonitor}";
               width = "100%";
               height = 15;
               background = "#00000000";
@@ -72,7 +72,7 @@ in
               wm-restack = "bspwm";
             };
             "bar/thi" = {
-              monitor = "${thirdMonitor}";
+#              monitor = "${thirdMonitor}";
               width = "100%";
               height = 15;
               background = "#00000000";

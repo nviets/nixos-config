@@ -38,8 +38,9 @@ in
 
   boot = {
     tmp = {
+      useTmpfs = true;
       cleanOnBoot = true;
-      tmpfsSize = "5GB";
+      #tmpfsSize = "5GB";
     };
     # kernelPackages = pkgs.linuxPackages_latest;
   };
@@ -49,7 +50,7 @@ in
     extraGroups = [ "wheel" "video" "audio" "camera" "networkmanager" "lp" "scanner" ];
   };
 
-  time.timeZone = "Europe/Brussels";
+  time.timeZone = "America/Chicago";
   i18n = {
     defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = {
@@ -90,25 +91,34 @@ in
     };
     systemPackages = with pkgs; [
       # Terminal
+      aria2 # download utility
       terminal # Terminal Emulator
       btop # Resource Manager
       cifs-utils # Samba
       coreutils # GNU Utilities
+      feedgnuplot # Plots
       git # Version Control
       gvfs # Samba
       killall # Process Killer
       lshw # Hardware Config
       nano # Text Editor
+      ncdu # ncurses disk usage
       nodejs # Javascript Runtime
       nodePackages.pnpm # Package Manager
+      nix-output-monitor # nom build
       nix-tree # Browse Nix Store
+      nvtopPackages.full # GPU resource monitor
       pciutils # Manage PCI
+      python3Packages.python-kasa # kasa power strip
       ranger # File Manager
       smartmontools # Disk Health
       tldr # Helper
+      tmux # tmux
+      ttyplot # Plots
       usbutils # Manage USB
       wget # Retriever
       xdg-utils # Environment integration
+      youplot # Plots
 
       # Video/Audio
       alsa-utils # Audio Control
@@ -123,12 +133,14 @@ in
 
       # Apps
       appimage-run # Runs AppImages on NixOS
+      duckdb # duckdb
       firefox # Browser
       google-chrome # Browser
+      googleearth-pro # World explorer
       remmina # XRDP & VNC Client
 
       # File Management
-      file-roller # Archive Manager
+      #file-roller # Archive Manager
       pcmanfm # File Browser
       p7zip # Zip Encryption
       rsync # Syncer - $ rsync -r dir1/ dir2/
@@ -154,10 +166,14 @@ in
       enable = true;
       libraries = [ ];
     };
+    neovim = {
+      defaultEditor = true;
+      vimAlias = true;
+    };
   };
 
-  hardware.pulseaudio.enable = false;
   services = {
+    pulseaudio.enable = false;
     printing = {
       enable = true;
     };
@@ -184,6 +200,8 @@ in
   nix = {
     settings = {
       auto-optimise-store = true;
+      system-features = [ "gccarch-broadwell" "benchmark" "big-parallel" "ca-derivations" "kvm" "nixos-test" ];
+      trusted-users = [ "nathanviets" ];
     };
     gc = {
       automatic = true;
@@ -198,22 +216,28 @@ in
       keep-derivations      = true
     '';
   };
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    permittedInsecurePackages = [
+      "googleearth-pro-7.3.6.10201"
+    ];
+  };
 
   system = {
     # autoUpgrade = {
     #   enable = true;
     #   channel = "https://nixos.org/channels/nixos-unstable";
     # };
-    stateVersion = "22.05";
+    stateVersion = "24.11";
   };
 
   home-manager.users.${vars.user} = {
     home = {
-      stateVersion = "22.05";
+      stateVersion = "24.11";
     };
     programs = {
       home-manager.enable = true;
+      neovim.vimAlias = true;
     };
     xdg = {
       mime.enable = true;

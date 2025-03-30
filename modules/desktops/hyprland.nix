@@ -150,7 +150,6 @@ with host;
           settings = {
             general = {
               hide_cursor = true;
-              no_fade_in = false;
               disable_loading_bar = true;
               grace = 0;
             };

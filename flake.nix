@@ -15,8 +15,14 @@
     {
       nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"; # Nix Packages (Default)
       # nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable"; # Unstable Nix Packages
-      nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05"; # Unstable Nix Packages
+      nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.11"; # Unstable Nix Packages
       nixos-hardware.url = "github:nixos/nixos-hardware/master"; # Hardware Specific Configurations
+
+      # sops-nix
+      sops-nix = {
+        url = "github:Mic92/sops-nix";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
 
       # User Environment Manager
       home-manager = {
@@ -32,7 +38,7 @@
 
       # Stable User Environment Manager
       home-manager-stable = {
-        url = "github:nix-community/home-manager/release-23.11";
+        url = "github:nix-community/home-manager/release-24.11";
         inputs.nixpkgs.follows = "nixpkgs-stable";
       };
 
@@ -62,7 +68,7 @@
 
       # Neovim
       nixvim-stable = {
-        url = "github:nix-community/nixvim/nixos-23.11";
+        url = "github:nix-community/nixvim/nixos-24.11";
         inputs.nixpkgs.follows = "nixpkgs-stable";
       };
 
@@ -98,11 +104,11 @@
       };
     };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-stable, nixos-hardware, home-manager, home-manager-stable, darwin, nur, nixgl, nixvim, nixvim-stable, doom-emacs, hyprland, hyprspace, plasma-manager, ... }: # Function telling flake which inputs to use
+  outputs = inputs @ { self, nixpkgs, nixpkgs-stable, sops-nix, nixos-hardware, home-manager, home-manager-stable, darwin, nur, nixgl, nixvim, nixvim-stable, doom-emacs, hyprland, hyprspace, plasma-manager, ... }: # Function telling flake which inputs to use
     let
       # Variables Used In Flake
       vars = {
-        user = "matthias";
+        user = "nathanviets";
         location = "$HOME/.setup";
         terminal = "kitty";
         editor = "nvim";
@@ -112,7 +118,7 @@
       nixosConfigurations = (
         import ./hosts {
           inherit (nixpkgs) lib;
-          inherit inputs nixpkgs nixpkgs-stable nixos-hardware home-manager nur nixvim doom-emacs hyprland hyprspace plasma-manager vars; # Inherit inputs
+          inherit inputs nixpkgs nixpkgs-stable sops-nix nixos-hardware home-manager nur nixvim doom-emacs hyprland hyprspace plasma-manager vars; # Inherit inputs
         }
       );
 
