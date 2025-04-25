@@ -18,16 +18,18 @@
 
 {
   imports = [
-      ./hardware-configuration.nix
-      ../../modules/programs/games.nix
-    ] ++
-    [(import ../../modules/services/tailscale.nix)] ++        # Tailscale
-    #[(import ../../modules/services/slurm/slurmMaster.nix)] ++ # Slurm
-    [(import ../../modules/services/ollama.nix)] ++           # LLMs
-    [(import ../../modules/services/rstudio.nix)] ++          # RStudio IDE matched to rEnv
-    [(import ../../modules/programs/rEnv/r.nix)]; #++           # R environment
-    #[(import ../../modules/desktops/bspwm.nix)];
-    #(import ../../modules/desktops/virtualisation);
+    ./hardware-configuration.nix
+    ../../modules/programs/games.nix
+  ] ++
+  [ (import ../../modules/services/tailscale.nix) ] ++ # Tailscale
+  [ (import ../../modules/services/slurm/slurmMaster.nix) ] ++ # Slurm
+  [ (import ../../modules/services/ollama.nix) ] ++ # LLMs
+  [ (import ../../modules/services/rstudio.nix) ] ++ # RStudio IDE matched to rEnv
+  [ (import ../../modules/services/spark.nix) ] ++ # Spark
+  [ (import ../../modules/programs/rEnv/r.nix) ]; # ++ # R environment
+  #[ (import ../../modules/desktops/hyprland.nix) ];
+  #[ (import ../../modules/desktops/bspwm.nix) ];
+  #(import ../../modules/desktops/virtualisation);
 
   boot = {
     loader = {
@@ -63,7 +65,7 @@
       enable = true;
     };
     nvidia = {
-      open = false;
+      open = true;
       package = config.boot.kernelPackages.nvidiaPackages.beta;
       nvidiaSettings = true;
       modesetting.enable = true;
@@ -87,7 +89,7 @@
       enable = true;
       fileSystems = [ "/" ];
     };
-    blueman.enable = true;                      # Bluetooth
+    blueman.enable = true; # Bluetooth
     xserver.videoDrivers = [ "nvidia" ];
   };
 
@@ -108,9 +110,19 @@
     ];
   };
 
+  nixpkgs.config.packageOverrides = pkgs: {
+    haskellPackages = pkgs.haskellPackages.override {
+      overrides = self: super: rec {
+        #cryptonite = pkgs.haskell.lib.dontCheck super.cryptonite;
+        #crypton = pkgs.haskell.lib.dontCheck super.crypton;
+        crypton-x509-validation = pkgs.haskell.lib.dontCheck super.crypton-x509-validation;
+      };
+    };
+  };
+
   nixpkgs.overlays = [
     (self: super: {
-      duckdb = super.duckdb.overrideAttrs ( _: { doInstallCheck = false; installCheckPhase = "echo HELLO"; doCheck = false; } );
+      duckdb = super.duckdb.overrideAttrs (_: { doInstallCheck = false; installCheckPhase = "echo HELLO"; doCheck = false; });
 
       python = super.python.override {
         packageOverrides = python-self: python-super: {
@@ -122,13 +134,16 @@
           numpy = super.numpy.overridePythonAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
         };
       };
-      pythonPackagesExtensions = super.pythonPackagesExtensions ++ [(
-        python-self: python-super: {
-          black = python-super.black.overrideAttrs (oldAttrs: { doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; installCheckPhase = "echo HELLO"; });
-          numpy = python-super.numpy.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
-          pendulum = python-super.pendulum.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
-        }
-      )];
+      pythonPackagesExtensions = super.pythonPackagesExtensions ++ [
+        (
+          python-self: python-super: {
+            anyio = python-super.anyio.overrideAttrs (oldAttrs: { doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; installCheckPhase = "echo HELLO"; });
+            black = python-super.black.overrideAttrs (oldAttrs: { doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; installCheckPhase = "echo HELLO"; });
+            numpy = python-super.numpy.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
+            pendulum = python-super.pendulum.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
+          }
+        )
+      ];
 
       python3 = super.python3.override {
         packageOverrides = python-self: python-super: {
@@ -140,11 +155,13 @@
           numpy = super.numpy.overridePythonAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
         };
       };
-      python3PackagesExtensions = super.python3PackagesExtensions ++ [(
-        python-self: python-super: {
-          numpy = python-super.numpy.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
-        }
-      )];
+      python3PackagesExtensions = super.python3PackagesExtensions ++ [
+        (
+          python-self: python-super: {
+            numpy = python-super.numpy.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
+          }
+        )
+      ];
 
       python312 = super.python312.override {
         packageOverrides = python-self: python-super: {
@@ -156,11 +173,13 @@
           numpy = super.numpy.overridePythonAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
         };
       };
-      python312PackagesExtensions = super.python312PackagesExtensions ++ [(
-        python-self: python-super: {
-          numpy = python-super.numpy.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
-        }
-      )];
+      python312PackagesExtensions = super.python312PackagesExtensions ++ [
+        (
+          python-self: python-super: {
+            numpy = python-super.numpy.overrideAttrs (oldAttrs: { disabledTests = [ "test_*" ]; doInstallCheck = false; doCheck = false; checkPhase = "echo HELLO"; pytestCheckPhase = "true"; installCheckPhase = "echo HELLO"; });
+          }
+        )
+      ];
     })
   ];
 }

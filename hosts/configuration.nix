@@ -40,7 +40,7 @@ in
     tmp = {
       useTmpfs = true;
       cleanOnBoot = true;
-      #tmpfsSize = "5GB";
+      #tmpfsSize = "10GB";
     };
     # kernelPackages = pkgs.linuxPackages_latest;
   };
@@ -98,6 +98,7 @@ in
       coreutils # GNU Utilities
       feedgnuplot # Plots
       git # Version Control
+      gcc
       gvfs # Samba
       killall # Process Killer
       lshw # Hardware Config

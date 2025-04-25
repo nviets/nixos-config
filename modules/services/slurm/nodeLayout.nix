@@ -5,11 +5,10 @@
         "superx10 Sockets=4 RealMemory=200000 CoresPerSocket=24 ThreadsPerCore=2 State=UNKNOWN"
       ];
       partitionName = [
-        "superx10 Nodes=sparkler Default=NO MaxTime=INFINITE State=UP"
+        "norm Nodes=superx10 Default=NO MaxTime=INFINITE State=UP"
       ];
       extraConfig = ''
-        SlurmctldHost=mini
-        SlurmctldHost=sparkler
+        SlurmctldHost=superx10
         SlurmctldLogFile=/var/log/slurm/slurmctld.log
         SlurmdLogFile=/var/log/slurm/slurmd.log
         #FastSchedule=1

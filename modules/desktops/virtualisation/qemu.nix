@@ -25,11 +25,11 @@
         # '';
         package = pkgs.qemu_kvm;
         swtpm.enable = true;
-# https://github.com/NixOS/nixpkgs/issues/381223
-#        ovmf = {
-#          enable = true;
-#          packages = [ pkgs.OVMFFull.fd ];
-#        };
+        # https://github.com/NixOS/nixpkgs/issues/381223
+        #        ovmf = {
+        #  enable = true;
+        #  packages = [ pkgs.OVMFFull.fd ];
+        #};
       };
     };
     spiceUSBRedirection.enable = true;

@@ -17,7 +17,7 @@ let
   nixpkgs-patched = (import nixpkgs { inherit system; }).applyPatches {
     name = "numpy-patch";
     src = nixpkgs;
-#    patches = [ ./test.patch ];
+    patches = [ ./test.patch ];
   };
 
   pkgs = import nixpkgs-patched {
@@ -28,7 +28,7 @@ let
   nixpkgs-stable-patched = (import nixpkgs-stable { inherit system; }).applyPatches {
     name = "numpy-patch";
     src = nixpkgs-stable;
-#    patches = [ ./test.patch ];
+    patches = [ ./test.patch ];
   };
 
   stable = import nixpkgs-stable-patched {

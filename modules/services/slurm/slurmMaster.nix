@@ -1,18 +1,21 @@
 { config, lib, pkgs, ... }: {
-  imports = [(import ./nodeLayout.nix)];
+  imports = [ (import ./nodeLayout.nix) ];
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 3306 6817 6818 6819 ];
   };
+
+  #users.users.munge.extraGroups = [ "keys" ];
+
   services = with pkgs; {
     mysql = {
       enable = true;
       package = pkgs.mariadb;
       ensureDatabases = [ "slurm_acct_db" ];
-      ensureUsers = [ {
+      ensureUsers = [{
         name = "slurm";
         ensurePermissions = { "slurm_acct_db.*" = "ALL PRIVILEGES"; };
-      } ];
+      }];
       settings = {
         mysqld = {
           innodb_buffer_pool_size = "6G";
@@ -25,7 +28,6 @@
       server.enable = true;
       enableStools = true;
       client.enable = true;
-      #controlMachine = "mini";
       clusterName = "home";
       dbdserver = {
         enable = true;

@@ -7,6 +7,8 @@ with pkgs.rPackages; [
   chores
   chronicler
   clustermq
+  crew
+  crew_cluster
   data_table
   #devtools
   duckdb
